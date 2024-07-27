@@ -17,6 +17,18 @@ func home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("hello world"))
 }
 
+// snippetView handler
+func snippetView(w http.ResponseWriter, r *http.Request) {
+	// write a byte slice as the response body
+	w.Write([]byte("Display a specific snippet"))
+}
+
+// add snippetCreate handler
+func snippetCreate(w http.ResponseWriter, r *http.Request) {
+	// write a byte slice as a response body
+	w.Write([]byte("Create a new snippet"))
+}
+
 // initialize main point of entry
 func main() {
 	// use the http.NewServeMux() function to initialize a new servemux, then
@@ -26,7 +38,15 @@ func main() {
 	// -- servemux treats the URL pattern "/" like a catch-all, meaning that all requests will be
 	// -- handled by provided function
 	mux := http.NewServeMux()
+
+	// Go’s servemux supports two different types of URL patterns: fixed
+	// paths and subtree paths. Fixed paths don’t end with a trailing slash,
+	// whereas subtree paths do end with a trailing slash.
+
 	mux.HandleFunc("/", home)
+	// add handlers for snippetView and snippetCreate
+	mux.HandleFunc("/snippet/view", snippetView)
+	mux.HandleFunc("/snippet/create", snippetCreate)
 
 	// print message to console
 	log.Print("Starting server on :4000")
