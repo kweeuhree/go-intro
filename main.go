@@ -14,6 +14,15 @@ import (
 // -- *http.Request parameter is a pointer to a struct which holds information about
 // -- the current request (like the HTTP method and the URL being requested)
 func home(w http.ResponseWriter, r *http.Request) {
+	// Check if the current request URL path exactly matches "/". If it
+	// doesn't, use the http.NotFound() function to send a 404 response to the client.
+	// return from the handler. Failing to return the handler would result
+	// in "hello world" message being printed as well
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
 	w.Write([]byte("hello world"))
 }
 
@@ -43,10 +52,10 @@ func main() {
 	// paths and subtree paths. Fixed paths don’t end with a trailing slash,
 	// whereas subtree paths do end with a trailing slash.
 
-	mux.HandleFunc("/", home)
+	mux.HandleFunc("/", home) // subtree path
 	// add handlers for snippetView and snippetCreate
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	mux.HandleFunc("/snippet/view", snippetView)     // fixed path
+	mux.HandleFunc("/snippet/create", snippetCreate) // fixed path
 
 	// print message to console
 	log.Print("Starting server on :4000")
