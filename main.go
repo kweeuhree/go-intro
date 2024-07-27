@@ -34,19 +34,53 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 
 // add snippetCreate handler
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
+	// Use r.Method to check whether the request is using POST or not.
+	if r.Method != "POST" {
+		// If it's not, use the w.WriteHeader() method to send a 405 status
+		// code and the w.Write() method to write a "Method Not Allowed"
+		// response body. return, so that the subsequent code is not executed.
+		// Use the Header().Set() method to add an 'Allow: POST' header to the
+		// response header map. The first parameter is the header name, and
+		// the second parameter is the header value
+		// -- WriteHeader can be called once per response
+		// -- once status code has been written it can't be changed
+		// -- without WriteHeader '200 OK' status will be sent, to customize
+		// -- you must call WriteHeader before any call to Write
+		w.Header().Set("Allow", "POST") // must be set before calling WriteHeader or Write
+		w.WriteHeader(405)
+		w.Write([]byte("Method Not Allowed"))
+		return
+	}
 	// write a byte slice as a response body
 	w.Write([]byte("Create a new snippet"))
 }
+
+// -- use http.Error() shortcut. This is a lightweight helper function
+// -- which takes a given message and status code, then calls the
+// -- w.WriteHeader() and w.Write() methods behind-the-scenes.
+// func snippetCreate(w http.ResponseWriter, r *http.Request) {
+// 		if r.Method != "POST" {
+// 			w.Header().Set("Allow", "POST")
+// 			// Use the http.Error() function to send a 405 status code and
+// 			// "Method Not Allowed" string as the response body.
+// 			http.Error(w, "Method Not Allowed", 405)
+// 			return
+// 		}
+
+// 		w.Write([]byte("Create a new snippet..."))
+// 	}
 
 // initialize main point of entry
 func main() {
 	// use the http.NewServeMux() function to initialize a new servemux, then
 	// register the home function as the handler for "/" URL pattern
+	// avoid DefaultServeMux as it is a global variable, any package can access it and register a route,
+	// which is a security issue
 	// -- each time the server receives a new HTTP request it will pass the request on to the servemux and
 	// -- the servemux will check the URL path and dispatch the request to the matching handler
 	// -- servemux treats the URL pattern "/" like a catch-all, meaning that all requests will be
 	// -- handled by provided function
-	mux := http.NewServeMux()
+	mux := http.NewServeMux() // locally-scoped servemux
 
 	// Go’s servemux supports two different types of URL patterns: fixed
 	// paths and subtree paths. Fixed paths don’t end with a trailing slash,
