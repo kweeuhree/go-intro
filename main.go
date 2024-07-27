@@ -3,8 +3,10 @@ package main
 
 // import logging and net/http
 import (
+	// formatted I/O functions
 	"log"
 	"net/http" // provides functionality for building HTTP servers and clients
+	//conversions to and from string representations of basic data types
 )
 
 // define a home handler function which writes a byte slice containing
@@ -46,7 +48,8 @@ func snippetCreate(w http.ResponseWriter, r *http.Request) {
 		// -- once status code has been written it can't be changed
 		// -- without WriteHeader '200 OK' status will be sent, to customize
 		// -- you must call WriteHeader before any call to Write
-		w.Header().Set("Allow", "POST") // must be set before calling WriteHeader or Write
+		w.Header().Set("Allow", "POST")                    // must be set before calling WriteHeader or Write
+		w.Header().Set("Content-Type", "application/json") // if unset manually will be set as 'text/plain'
 		w.WriteHeader(405)
 		w.Write([]byte("Method Not Allowed"))
 		return
